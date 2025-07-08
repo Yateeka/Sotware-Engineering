@@ -1,0 +1,111 @@
+# React Dependencies
+node_modules/
+
+# React Build outputs
+build/
+dist/
+
+# React Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# React Testing and Coverage
+coverage/
+.nyc_output/
+
+# React Cache directories
+.cache/
+.parcel-cache/
+
+# React Package manager files
+package-lock.json
+yarn.lock
+.pnp
+.pnp.js
+
+# React ESLint cache
+.eslintcache
+
+# Flask Python files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Flask Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Flask Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Flask Instance folder
+instance/
+
+# Flask Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Flask Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Flask Logs
+*.log
+logs/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
