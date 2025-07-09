@@ -1,21 +1,22 @@
-import { Box, CssBaseline } from '@mui/material';
+import { Box } from '@mui/material';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useEffect } from 'react';
+import Navigation from '../components/global/Navigation';
+import '../global.css';
 
-// App
 const App = ({ Component, pageProps }: AppProps) => {
-
-    return (
-        <Box>
-            <Head>
-                <title>CSC 4350 Project</title>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-            </Head>
-            <CssBaseline />
-            <Component {...pageProps} />
-        </Box>
-    );
+  return (
+    <Box>
+      <Head>
+        <title>Global Protest Tracker</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
+      <Navigation />
+      <Box>
+        <Component {...pageProps} />
+      </Box>
+    </Box>
+  );
 };
 
 export default App;
