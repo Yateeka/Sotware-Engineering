@@ -109,3 +109,5 @@ temp/
 *.zip
 *.tar.gz
 *.rar
+
+.next
