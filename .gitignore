@@ -2,6 +2,14 @@
 node_modules/
 
 # React Build outputs
+.next/
+.next/cache/
+.next/static/
+.next/standalone/
+.next/server/
+.next/BUILD_ID  
+# React Build artifacts
+
 build/
 dist/
 
@@ -110,4 +118,3 @@ temp/
 *.tar.gz
 *.rar
 
-.next/
