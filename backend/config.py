@@ -1,0 +1,79 @@
+import os
+from pathlib import Path
+
+class Config:
+    """Base configuration class."""
+    
+    # Flask settings
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key'
+    
+    # Database settings
+    MONGODB_URI = os.environ.get('MONGODB_URI') or 'mongodb://localhost:27017/protest_tracker'
+    
+    # Data source configuration
+    USE_TEST_DATA = os.environ.get('USE_TEST_DATA', 'False').lower() == 'true'
+    
+    # API settings
+    API_RATE_LIMIT = os.environ.get('API_RATE_LIMIT') or '100 per hour'
+    
+    # File paths
+    BASE_DIR = Path(__file__).parent
+    TEST_DATA_PATH = BASE_DIR / 'test' / 'test_data.json'
+    
+    # CORS settings
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',')
+    
+    @staticmethod
+    def init_app(app):
+        """Initialize application with this config."""
+        pass
+
+class DevelopmentConfig(Config):
+    """Development configuration."""
+    DEBUG = True
+    # USE_TEST_DATA is inherited from base Config class (uses environment variable)
+
+class TestingConfig(Config):
+    """Testing configuration."""
+    TESTING = True
+    USE_TEST_DATA = True  # Always use JSON data for tests
+    WTF_CSRF_ENABLED = False
+
+class ProductionConfig(Config):
+    """Production configuration."""
+    DEBUG = False
+    USE_TEST_DATA = False  # Use MongoDB in production
+    
+    @classmethod
+    def init_app(cls, app):
+        Config.init_app(app)
+        
+        # Log to syslog in production
+        import logging
+        from logging.handlers import SysLogHandler
+        syslog_handler = SysLogHandler()
+        syslog_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(syslog_handler)
+
+# Configuration dictionary
+config = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
+}
+
+# MongoDB Configuration Examples:
+# For local MongoDB: mongodb://localhost:27017/protest_tracker
+# For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/protest_tracker
+# For Docker: mongodb://mongo:27017/protest_tracker
+
+# Environment Variables to Set:
+# export MONGODB_URI="mongodb://localhost:27017/protest_tracker"
+# export SECRET_KEY="your-secret-key-here"
+# export FLASK_CONFIG="development"  # or "production"
+
+# Optional API Keys (for future data collection features):
+# export GDELT_API_KEY="your-gdelt-key"
+# export NEWS_API_KEY="your-news-api-key"
+# export GEONAMES_USERNAME="your-geonames-username"
