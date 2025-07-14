@@ -1,5 +1,5 @@
 # Software-Engineering
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1. Clone the Repository
 
@@ -25,7 +25,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🧼 Git Hygiene
+## Git Hygiene
 
 To avoid committing unnecessary files like libraries or build folders, we use a `.gitignore` file that excludes:
 
