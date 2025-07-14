@@ -10,11 +10,18 @@ const navItems = [
   { href: '/likes', label: 'Likes', icon: '/nav/heart.svg' },
   { href: '/create', label: 'Create', icon: '/nav/create.svg' },
   { href: '/profile', label: 'Profile', icon: '/nav/profile.svg', isProfile: true },
+  { href: '/', label: 'Home', icon: '/nav/home.svg' },
+  { href: '/search', label: 'Search', icon: '/nav/search.svg' },
+  { href: '/feed', label: 'Explore', icon: '/nav/explore.svg' },
+  { href: '/messages', label: 'Messages', icon: '/nav/message.svg' },
+  { href: '/likes', label: 'Likes', icon: '/nav/heart.svg' },
+  { href: '/create', label: 'Create', icon: '/nav/create.svg' },
+  { href: '/profile', label: 'Profile', icon: '/nav/profile.svg', isProfile: true },
 ];
 
 const Navigation = () => {
   return (
-    <div className="w-20 bg-primary min-h-screen flex flex-col items-center py-6">
+    <nav className="fixed left-0 top-0 w-20 bg-primary min-h-screen flex flex-col items-center py-6 shadow-lg z-40">
       {/* Logo */}
       <div className="mb-10">
         <img
@@ -30,7 +37,7 @@ const Navigation = () => {
           <Link
             key={href}
             href={href}
-            className="relative group flex items-center justify-center w-12 h-12 hover:bg-accent-light rounded-xl transition"
+            className="relative group flex items-center justify-center w-12 h-12 hover:bg-secondary rounded-xl transition"
           >
             <div className="w-6 h-6 flex items-center justify-center">
               <img
@@ -41,6 +48,7 @@ const Navigation = () => {
                 style={{ display: 'block' }}
               />
             </div>
+            
             {/* Tooltip */}
             <span className="absolute left-24 whitespace-nowrap bg-black text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
               {label}
@@ -48,7 +56,7 @@ const Navigation = () => {
           </Link>
         ))}
       </div>
-    </div>
+    </nav>
   );
 };
 
