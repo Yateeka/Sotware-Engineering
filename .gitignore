@@ -8,6 +8,8 @@ node_modules/
 .next/standalone/
 .next/server/
 .next/BUILD_ID  
+.next/server
+
 # React Build artifacts
 
 build/
