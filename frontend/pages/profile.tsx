@@ -49,14 +49,14 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-background">
       <div className="pt-20 px-4 max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
           {/* Profile Header */}
           <div className="relative">
-            <div className="h-48 w-full bg-[#c8d5b9]" />
+            <div className="h-48 w-full bg-secondary" />
             <div className="absolute -bottom-16 left-8">
-              <div className="w-32 h-32 rounded-full border-4 border-white flex items-center justify-center text-4xl font-bold text-white bg-[#4a7c59]">
+              <div className="w-32 h-32 rounded-full border-4 border-white flex items-center justify-center text-4xl font-bold text-white bg-primary">
                 AJ
               </div>
             </div>
@@ -65,20 +65,20 @@ const Profile: React.FC = () => {
           <div className="pt-20 pb-8 px-8">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{userData.name}</h1>
+                <h1 className="text-3xl font-bold text-charcoal-dark">{userData.name}</h1>
                 <p className="text-gray-600">{userData.username}</p>
                 <p className="text-sm text-gray-500 mt-1">
                   📍 {userData.location} • Joined {userData.joinDate}
                 </p>
               </div>
               <button
-                className="px-6 py-2 text-white rounded-lg bg-[#4a7c59] transition-colors hover:bg-[#81a989]"
+                className="px-6 py-2 text-white rounded-lg bg-primary transition-colors"
               >
                 Edit Profile
               </button>
             </div>
 
-            <p className="text-gray-700 mb-6">{userData.bio}</p>
+            <p className="text-stone-dark mb-6">{userData.bio}</p>
 
             {/* Stats */}
             <div className="grid grid-cols-4 gap-6 mb-6">
@@ -89,21 +89,21 @@ const Profile: React.FC = () => {
                 ['Following', userData.stats.followingCount.toLocaleString()],
               ].map(([label, value]) => (
                 <div key={label} className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{value}</div>
-                  <div className="text-sm text-[#6b8f71]">{label}</div>
+                  <div className="text-2xl font-bold text-accent-dark">{value}</div>
+                  <div className="text-sm text-primary">{label}</div>
                 </div>
               ))}
             </div>
 
             {/* Badges */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Achievements</h3>
+              <h3 className="text-lg font-semibold text-accent-dark mb-3">Achievements</h3>
               <div className="flex flex-wrap gap-4">
                 {userData.badges.map((badge, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
+                  <div key={index} className="flex items-center gap-2 bg-background px-3 py-2 rounded-lg">
                     <span className="text-xl">{badge.icon}</span>
                     <div>
-                      <div className="font-medium text-gray-900">{badge.name}</div>
+                      <div className="font-medium text-accent-dark">{badge.name}</div>
                       <div className="text-xs text-gray-600">{badge.description}</div>
                     </div>
                   </div>
@@ -120,8 +120,8 @@ const Profile: React.FC = () => {
               key={tab}
               className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${
                 activeTab === tab
-                  ? 'bg-[#4a7c59] text-white'
-                  : 'bg-transparent text-[#4a7c59] border border-[#4a7c59] hover:bg-[#81a989] hover:text-white'
+                  ? 'bg-primary text-white'
+                  : 'bg-transparent text-primary border border-primary hover:bg-moss-medium hover:text-white'
               }`}
               onClick={() => setActiveTab(tab)}
             >
@@ -134,13 +134,13 @@ const Profile: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           {activeTab === 'overview' && (
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
+              <h3 className="text-xl font-semibold text-accent-dark mb-4">Recent Activity</h3>
               <div className="space-y-4">
                 {userData.recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div key={activity.id} className="flex items-center gap-4 p-4 bg-background rounded-lg">
                     <span className="text-2xl">{activity.icon}</span>
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-charcoal-dark">
                         {activity.type === 'attended'
                           ? 'Attended'
                           : activity.type === 'shared'
@@ -160,21 +160,21 @@ const Profile: React.FC = () => {
 
           {activeTab === 'activity' && (
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">All Activity</h3>
+              <h3 className="text-xl font-semibold text-accent-dark mb-4">All Activity</h3>
               <p className="text-gray-600">Comprehensive activity history will be displayed here.</p>
             </div>
           )}
 
           {activeTab === 'posts' && (
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Your Posts</h3>
+              <h3 className="text-xl font-semibold text-accent-dark mb-4">Your Posts</h3>
               <p className="text-gray-600">Your shared posts and updates will be displayed here.</p>
             </div>
           )}
 
           {activeTab === 'events' && (
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Events</h3>
+              <h3 className="text-xl font-semibold text-accent-dark mb-4">Events</h3>
               <p className="text-gray-600">Events you've organized or plan to attend will be displayed here.</p>
             </div>
           )}

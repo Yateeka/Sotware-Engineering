@@ -13,3 +13,11 @@ body {
 * {
   box-sizing: border-box;
 }
+
+@theme {
+  --color-background: #f3f4f6; /* light gray */
+  --color-primary: #4a7c59; /* dark green */
+  --color-secondary: #c8d5b9; /* pale green */
+  --color-accent-light: #81a989; /* light green */
+  --color-accent-dark: #02311c; /* dark green */
+}
