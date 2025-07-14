@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 
 interface Protest {
-  id: number;
-  title: string;
-  location: string;
-  date: string;
-  participants: string;
-  status: 'ongoing' | 'ended' | 'planned';
+    id: number;
+    title: string;
+    location: string;
+    date: string;
+    participants: string;
+    status: 'ongoing' | 'ended' | 'planned';
 }
 
 const Home: React.FC = () => {
-  const [recentProtests, setRecentProtests] = useState<Protest[]>([]);
+    const [recentProtests, setRecentProtests] = useState<Protest[]>([]);
 
   useEffect(() => {
     setRecentProtests([
@@ -41,12 +41,16 @@ const Home: React.FC = () => {
     ]);
   }, []);
 
-  return (
-    <div className="min-h-screen bg-secondary">
-      {/* Hero Section */}
-      <section className="py-20 px-8 bg-primary">
-        <img src="/assets/Earth.png" alt="Hero Map" />
-      </section>
+    return (
+        <div className="w-full h-full min-h-screen bg-secondary">
+            {/* Hero Section */}
+            <section className="flex items-center justify-center h-screen bg-primary">
+                <img
+                    src="/assets/Earth.png"
+                    alt="Hero Map"
+                    className="max-w-full h-auto"
+                />
+            </section>
 
       {/* Stats Section */}
       <section className="py-16 bg-background">
