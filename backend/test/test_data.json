@@ -1,0 +1,79 @@
+{
+    "protests": [
+        {
+            "protest_id": "1",
+            "title": "Climate Action March",
+            "description": "March for climate action and environmental policies",
+            "latitude": 33.7490,
+            "longitude": -84.3880,
+            "city": "Atlanta",
+            "country": "United States",
+            "categories": ["Environmental Justice", "Climate Change"],
+            "start_date": "2024-03-15",
+            "participant_count": 5000,
+            "status": "completed"
+        },
+        {
+            "protest_id": "2", 
+            "title": "Workers Rights Rally",
+            "description": "Rally for better working conditions and fair wages",
+            "latitude": 40.7128,
+            "longitude": -74.0060,
+            "city": "New York",
+            "country": "United States", 
+            "categories": ["Labor Rights", "Workers Rights"],
+            "start_date": "2024-03-20",
+            "participant_count": 3000,
+            "status": "ongoing"
+        },
+        {
+            "protest_id": "3",
+            "title": "Education Funding Protest",
+            "description": "Protest for increased education funding",
+            "latitude": 30.2672,
+            "longitude": -97.7431,
+            "city": "Austin",
+            "country": "United States",
+            "categories": ["Education", "Public Policy"],
+            "start_date": "2024-03-25",
+            "participant_count": 2500,
+            "status": "planned"
+        }
+    ],
+    "users": [
+        {
+            "user_id": "user1",
+            "username": "testuser",
+            "email": "test@example.com",
+            "password_hash": "hashed_password_123",
+            "user_type_id": "1",
+            "verified": true,
+            "created_at": "2024-01-01",
+            "last_login": "2024-03-10"
+        }
+    ],
+    "user_types": [
+        {
+            "user_type_id": "1",
+            "type_name": "Regular User",
+            "description": "Standard user account",
+            "permissions": ["view_protests", "create_alerts"],
+            "can_submit_reports": false
+        },
+        {
+            "user_type_id": "2", 
+            "type_name": "Verified Activist",
+            "description": "Verified activist account",
+            "permissions": ["view_protests", "create_alerts", "submit_reports"],
+            "can_submit_reports": true
+        }
+    ],
+    "alerts": [
+        {
+            "alert_id": "1",
+            "user_id": "user1",
+            "keywords": ["climate", "environmental"],
+            "location_filter": "Atlanta, Georgia"
+        }
+    ]
+}

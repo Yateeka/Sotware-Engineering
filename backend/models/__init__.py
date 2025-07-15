@@ -1,5 +1,6 @@
 """
 Models package initialization
+<<<<<<< HEAD
 Database schemas and data structures for Global Protest Tracker
 """
 
@@ -34,3 +35,7 @@ __all__ = [
     'user_content_model',
     'admin_action_model'
 ]
+=======
+Database schemas and data structures
+"""
+>>>>>>> origin/main

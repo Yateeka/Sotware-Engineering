@@ -3,9 +3,12 @@ import os
 from typing import List, Dict, Optional, Any
 from datetime import datetime
 
+<<<<<<< HEAD
 # Import MongoDB models
 from models import protest_model, user_model, alert_model, user_content_model, admin_action_model
 
+=======
+>>>>>>> origin/main
 class DataService:
     """
     Data service abstraction layer.
@@ -93,12 +96,20 @@ class DataService:
         return protests
     
     def _get_protests_from_mongodb(self, filters: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+<<<<<<< HEAD
         """Get protests from MongoDB."""
         try:
             return protest_model.find_with_filters(filters)
         except Exception as e:
             print(f"Error getting protests from MongoDB: {e}")
             return []
+=======
+        """Get protests from MongoDB (placeholder for future implementation)."""
+        # TODO: Implement MongoDB queries when database is set up
+        # from models.protest import Protest
+        # return Protest.find_with_filters(filters)
+        raise NotImplementedError("MongoDB integration not yet implemented")
+>>>>>>> origin/main
     
     def get_protest_by_id(self, protest_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -121,12 +132,20 @@ class DataService:
         return next((p for p in protests if p.get('protest_id') == protest_id), None)
     
     def _get_protest_by_id_from_mongodb(self, protest_id: str) -> Optional[Dict[str, Any]]:
+<<<<<<< HEAD
         """Get specific protest from MongoDB."""
         try:
             return protest_model.find_by_id(protest_id)
         except Exception as e:
             print(f"Error getting protest by ID from MongoDB: {e}")
             return None
+=======
+        """Get specific protest from MongoDB (placeholder)."""
+        # TODO: Implement MongoDB query
+        # from models.protest import Protest
+        # return Protest.find_by_id(protest_id)
+        raise NotImplementedError("MongoDB integration not yet implemented")
+>>>>>>> origin/main
     
     def search_protests(self, keyword: str = "") -> List[Dict[str, Any]]:
         """
@@ -173,12 +192,20 @@ class DataService:
         return filtered_protests
     
     def _search_protests_from_mongodb(self, keyword: str = "") -> List[Dict[str, Any]]:
+<<<<<<< HEAD
         """Search protests in MongoDB."""
         try:
             return protest_model.search(keyword)
         except Exception as e:
             print(f"Error searching protests in MongoDB: {e}")
             return []
+=======
+        """Search protests in MongoDB (placeholder)."""
+        # TODO: Implement MongoDB text search
+        # from models.protest import Protest
+        # return Protest.search(keyword)
+        raise NotImplementedError("MongoDB integration not yet implemented")
+>>>>>>> origin/main
     
     def create_alert(self, alert_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -230,6 +257,7 @@ class DataService:
         }
     
     def _create_alert_from_mongodb(self, alert_data: Dict[str, Any]) -> Dict[str, Any]:
+<<<<<<< HEAD
         """Create alert in MongoDB."""
         try:
             result = alert_model.create(alert_data)
@@ -240,6 +268,13 @@ class DataService:
         except Exception as e:
             print(f"Error creating alert in MongoDB: {e}")
             raise ValueError(f"Failed to create alert: {str(e)}")
+=======
+        """Create alert in MongoDB (placeholder)."""
+        # TODO: Implement MongoDB insert
+        # from models.alert import Alert
+        # return Alert.create(alert_data)
+        raise NotImplementedError("MongoDB integration not yet implemented")
+>>>>>>> origin/main
     
     def get_user_by_id(self, user_id: str) -> Optional[Dict[str, Any]]:
         """Get user by ID (for future use)."""
@@ -247,6 +282,7 @@ class DataService:
             users = self._test_data.get('users', [])
             return next((u for u in users if u.get('user_id') == user_id), None)
         else:
+<<<<<<< HEAD
             try:
                 return user_model.find_by_id(user_id)
             except Exception as e:
@@ -332,3 +368,7 @@ class DataService:
             except Exception as e:
                 print(f"Error authenticating user in MongoDB: {e}")
                 return None
+=======
+            # TODO: Implement MongoDB query
+            raise NotImplementedError("MongoDB integration not yet implemented")
+>>>>>>> origin/main

@@ -1,8 +1,58 @@
+<<<<<<< HEAD
 # Python
+=======
+# React Dependencies
+node_modules/
+
+# React Build outputs
+.next/
+.next/cache/
+.next/static/
+.next/standalone/
+.next/server/
+.next/BUILD_ID  
+.next/server
+
+# React Build artifacts
+
+build/
+dist/
+
+# React Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# React Testing and Coverage
+coverage/
+.nyc_output/
+
+# React Cache directories
+.cache/
+.parcel-cache/
+
+# React Package manager files
+package-lock.json
+yarn.lock
+.pnp
+.pnp.js
+
+# React ESLint cache
+.eslintcache
+
+# Flask Python files
+>>>>>>> origin/main
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+<<<<<<< HEAD
+=======
+
+# Flask Distribution / packaging
+>>>>>>> origin/main
 .Python
 build/
 develop-eggs/
@@ -16,17 +66,27 @@ parts/
 sdist/
 var/
 wheels/
+<<<<<<< HEAD
+=======
+pip-wheel-metadata/
+share/python-wheels/
+>>>>>>> origin/main
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
+<<<<<<< HEAD
 # Virtual environments
+=======
+# Flask Virtual environments
+>>>>>>> origin/main
 venv/
 env/
 ENV/
 env.bak/
 venv.bak/
+<<<<<<< HEAD
 
 # Environment variables
 .env
@@ -36,13 +96,41 @@ venv.bak/
 .env.production.local
 
 # IDE
+=======
+.venv/
+
+# Flask Instance folder
+instance/
+
+# Flask Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Flask Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Flask Logs
+*.log
+logs/
+
+# IDE and Editor files
+>>>>>>> origin/main
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
+<<<<<<< HEAD
 # OS
+=======
+# OS generated files
+>>>>>>> origin/main
 .DS_Store
 .DS_Store?
 ._*
@@ -51,6 +139,7 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
+<<<<<<< HEAD
 # Logs
 *.log
 logs/
@@ -89,3 +178,16 @@ coverage.xml
 *.bak
 *.backup
 *.tmp
+=======
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+>>>>>>> origin/main

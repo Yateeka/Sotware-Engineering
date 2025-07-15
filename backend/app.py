@@ -1,10 +1,13 @@
 from flask import Flask
 from flask_cors import CORS
 import os
+<<<<<<< HEAD
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
+=======
+>>>>>>> origin/main
 
 from config import config
 from services.data_service import DataService
@@ -103,4 +106,8 @@ if __name__ == '__main__':
     # Create app and run in development mode
     app = create_app('development')
     init_basic_routes(app)
+<<<<<<< HEAD
     app.run(debug=True, host='0.0.0.0', port=5001)
+=======
+    app.run(debug=True, host='0.0.0.0', port=5000)
+>>>>>>> origin/main

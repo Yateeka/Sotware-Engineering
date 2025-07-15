@@ -1,0 +1,128 @@
+{
+    "test_execution_summary": {
+        "project_name": "Global Protest Tracker - Backend API",
+        "test_suite": "User Scenario Integration Tests",
+        "execution_date": "2025-07-11T23:30:30.394836",
+        "total_execution_time_seconds": 0.03,
+        "total_tests": 5,
+        "tests_passed": 5,
+        "tests_failed": 0,
+        "success_rate": "100.0%",
+        "overall_status": "ALL TESTS PASSED"
+    },
+    "api_endpoints_tested": [
+        "GET /api/protests (with various filters)",
+        "GET /api/protests/<id>",
+        "GET /api/search/protests",
+        "POST /api/alerts"
+    ],
+    "test_scenarios_executed": [
+        {
+            "scenario_id": 1,
+            "description": "User browses protests by location and quits",
+            "user_workflow": "Filter by location \u2192 View results \u2192 Quit",
+            "primary_functionality": "Location-based filtering"
+        },
+        {
+            "scenario_id": 2,
+            "description": "User browses protests by cause and quits",
+            "user_workflow": "Filter by cause \u2192 View results \u2192 Quit",
+            "primary_functionality": "Cause-based filtering"
+        },
+        {
+            "scenario_id": 3,
+            "description": "User searches by keyword and views results",
+            "user_workflow": "Search keyword \u2192 View results \u2192 Quit",
+            "primary_functionality": "Keyword search across multiple fields"
+        },
+        {
+            "scenario_id": 4,
+            "description": "User filters by date range and location",
+            "user_workflow": "Apply multiple filters \u2192 View results \u2192 Quit",
+            "primary_functionality": "Complex multi-filter functionality"
+        },
+        {
+            "scenario_id": 5,
+            "description": "User filters, views details, saves alert",
+            "user_workflow": "Filter \u2192 View details \u2192 Create alert \u2192 Quit",
+            "primary_functionality": "Multi-step workflow with CRUD operations"
+        }
+    ],
+    "detailed_test_results": [
+        {
+            "test_name": "Scenario 1: Browse by Location and Quit",
+            "status": "PASSED",
+            "execution_time": 0.002004861831665039,
+            "timestamp": "2025-07-11T23:30:30.373428",
+            "details": {
+                "endpoint_tested": "GET /api/protests?location=Atlanta,Georgia",
+                "response_code": 200,
+                "protests_found": 1,
+                "atlanta_protest_verified": true,
+                "filters_working": true
+            }
+        },
+        {
+            "test_name": "Scenario 2: Browse by Cause and Quit",
+            "status": "PASSED",
+            "execution_time": 0.0010030269622802734,
+            "timestamp": "2025-07-11T23:30:30.378564",
+            "details": {
+                "endpoint_tested": "GET /api/protests?cause=Environmental Justice",
+                "response_code": 200,
+                "environmental_protests_found": 1,
+                "cause_filtering_working": true
+            }
+        },
+        {
+            "test_name": "Scenario 3: Search by Keyword and Quit",
+            "status": "PASSED",
+            "execution_time": 0.0015027523040771484,
+            "timestamp": "2025-07-11T23:30:30.384492",
+            "details": {
+                "endpoint_tested": "GET /api/search/protests?keyword=climate",
+                "response_code": 200,
+                "climate_protests_found": 1,
+                "keyword_search_working": true,
+                "search_accuracy_verified": true
+            }
+        },
+        {
+            "test_name": "Scenario 4: Filter by Date and Location then Quit",
+            "status": "PASSED",
+            "execution_time": 0.0010294914245605469,
+            "timestamp": "2025-07-11T23:30:30.389828",
+            "details": {
+                "endpoint_tested": "GET /api/protests?location=New York,NY&start_date=2024-03-01&end_date=2024-03-31",
+                "response_code": 200,
+                "filtered_protests_found": 1,
+                "location_matches": 1,
+                "dates_in_range": 1,
+                "complex_filtering_working": true
+            }
+        },
+        {
+            "test_name": "Scenario 5: Filter, View Details, Save Alert, Quit",
+            "status": "PASSED",
+            "execution_time": 0.0015022754669189453,
+            "timestamp": "2025-07-11T23:30:30.394836",
+            "details": {
+                "endpoints_tested": [
+                    "GET /api/protests?cause=Labor Rights",
+                    "GET /api/protests/2",
+                    "POST /api/alerts"
+                ],
+                "labor_protests_found": 1,
+                "protest_details_retrieved": true,
+                "alert_created_successfully": true,
+                "multi_step_workflow_working": true,
+                "alert_id_generated": "alert_2"
+            }
+        }
+    ],
+    "performance_metrics": {
+        "average_response_time": "0.001s",
+        "fastest_test": "0.001s",
+        "slowest_test": "0.002s"
+    }
+}

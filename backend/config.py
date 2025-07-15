@@ -31,7 +31,11 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
+<<<<<<< HEAD
     # USE_TEST_DATA is inherited from base Config class (uses environment variable)
+=======
+    USE_TEST_DATA = True  # Use JSON data in development
+>>>>>>> origin/main
 
 class TestingConfig(Config):
     """Testing configuration."""
@@ -63,6 +67,7 @@ config = {
     'default': DevelopmentConfig
 }
 
+<<<<<<< HEAD
 # MongoDB Configuration Examples:
 # For local MongoDB: mongodb://localhost:27017/protest_tracker
 # For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/protest_tracker
@@ -77,3 +82,10 @@ config = {
 # export GDELT_API_KEY="your-gdelt-key"
 # export NEWS_API_KEY="your-news-api-key"
 # export GEONAMES_USERNAME="your-geonames-username"
+=======
+# TODO: MongoDB connection string
+# TODO: API keys for GDELT, NewsAPI, GeoNames
+# TODO: Secret key for sessions
+# TODO: Email configuration for alerts
+# TODO: Data collection intervals
+>>>>>>> origin/main

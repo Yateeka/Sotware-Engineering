@@ -1,0 +1,43 @@
+================================================================================
+GLOBAL PROTEST TRACKER - BACKEND API TEST RESULTS
+================================================================================
+
+EXECUTION SUMMARY
+Test Date: 2025-07-11 23:30:30
+Total Tests: 5
+Passed: 5
+Failed: 0
+Success Rate: 100.0%
+Total Execution Time: 0.030 seconds
+Overall Status: ALL TESTS PASSED
+
+TEST SCENARIOS RESULTS
+----------------------------------------
+Test 1: Scenario 1: Browse by Location and Quit
+   Status: PASSED
+   Execution Time: 0.002s
+
+Test 2: Scenario 2: Browse by Cause and Quit
+   Status: PASSED
+   Execution Time: 0.001s
+
+Test 3: Scenario 3: Search by Keyword and Quit
+   Status: PASSED
+   Execution Time: 0.002s
+
+Test 4: Scenario 4: Filter by Date and Location then Quit
+   Status: PASSED
+   Execution Time: 0.001s
+
+Test 5: Scenario 5: Filter, View Details, Save Alert, Quit
+   Status: PASSED
+   Execution Time: 0.002s
+
+API ENDPOINTS TESTED
+----------------------------------------
+GET /api/protests (with various filters)
+GET /api/protests/<id>
+GET /api/search/protests
+POST /api/alerts
+
+Detailed results saved to: test_results.json
