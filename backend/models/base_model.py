@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from bson import ObjectId
+from bson import ObjectId  # MongoDB ObjectId
 from typing import Dict, List, Optional, Any, Union
 import logging
 
@@ -8,52 +8,52 @@ from .database import DatabaseManager
 
 class BaseModel(ABC):
     """Enhanced base model class for MongoDB documents"""
-    
+
     def __init__(self, db_manager: DatabaseManager, collection_name: str):
-        self.db_manager = db_manager
-        self.collection_name = collection_name
+        self.db_manager = db_manager  # DB manager
+        self.collection_name = collection_name  # Collection name
         self._collection = None
-    
+
     @property
     @abstractmethod
     def collection(self):
         """Return the MongoDB collection"""
         pass
-    
+
     def create(self, data: Dict) -> ObjectId:
         """Create a new document"""
         try:
             # Add timestamps
             now = datetime.now()
-            data['created_at'] = now
-            data['updated_at'] = now
-            
+            data['created_at'] = now  # Creation time
+            data['updated_at'] = now  # Update time
+
             # Validate data
-            validated_data = self.validate_create_data(data)
-            
-            result = self.collection.insert_one(validated_data)
+            validated_data = self.validate_create_data(data)  # Validate input
+
+            result = self.collection.insert_one(validated_data)  # Insert document
             logging.info(f"Created {self.collection_name} with ID: {result.inserted_id}")
-            return result.inserted_id
-            
+            return result.inserted_id  # Return ID
+
         except Exception as e:
             logging.error(f"Error creating {self.collection_name}: {e}")
             raise
-    
+
     def create_many(self, data_list: List[Dict]) -> List[ObjectId]:
         """Create multiple documents"""
         try:
             now = datetime.now()
             validated_data = []
-            
+
             for data in data_list:
-                data['created_at'] = now
-                data['updated_at'] = now
-                validated_data.append(self.validate_create_data(data))
-            
-            result = self.collection.insert_many(validated_data)
+                data['created_at'] = now  # Creation time
+                data['updated_at'] = now  # Update time
+                validated_data.append(self.validate_create_data(data))  # Validate each
+
+            result = self.collection.insert_many(validated_data)  # Bulk insert
             logging.info(f"Created {len(result.inserted_ids)} {self.collection_name} documents")
-            return result.inserted_ids
-            
+            return result.inserted_ids  # Return IDs
+
         except Exception as e:
             logging.error(f"Error creating multiple {self.collection_name}: {e}")
             raise
@@ -62,34 +62,34 @@ class BaseModel(ABC):
         """Find document by ID"""
         try:
             if isinstance(doc_id, str):
-                doc_id = ObjectId(doc_id)
-            return self.collection.find_one({"_id": doc_id})
+                doc_id = ObjectId(doc_id)  # Convert string
+            return self.collection.find_one({"_id": doc_id})  # Find by ID
         except Exception as e:
             logging.error(f"Error finding {self.collection_name} by ID: {e}")
             return None
-    
+
     def find_one(self, query: Dict) -> Optional[Dict]:
         """Find one document by query"""
         try:
-            return self.collection.find_one(query)
+            return self.collection.find_one(query)  # Single document
         except Exception as e:
             logging.error(f"Error finding one {self.collection_name}: {e}")
             return None
-    
+
     def find_many(self, query: Dict = None, limit: int = 100, sort: List = None, skip: int = 0) -> List[Dict]:
         """Find multiple documents with pagination"""
         try:
             query = query or {}
-            cursor = self.collection.find(query)
-            
+            cursor = self.collection.find(query)  # Find documents
+
             if sort:
-                cursor = cursor.sort(sort)
-            
+                cursor = cursor.sort(sort)  # Apply sorting
+
             if skip > 0:
-                cursor = cursor.skip(skip)
-                
-            return list(cursor.limit(limit))
-            
+                cursor = cursor.skip(skip)  # Skip records
+
+            return list(cursor.limit(limit))  # Limit results
+
         except Exception as e:
             logging.error(f"Error finding {self.collection_name}: {e}")
             return []
