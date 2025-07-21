@@ -1,6 +1,6 @@
 # MongoDB Database Setup for Global Protest Tracker
 
-Hey! This guide will help you get the MongoDB database up and running for our protest tracker app. Don't worry if you're new to MongoDB - I'll walk you through everything step by step.
+This guide will help you get the MongoDB database up and running for our protest tracker app. These steps should walk you through everything step by step.
 
 ## What's in the Database?
 
