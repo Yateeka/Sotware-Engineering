@@ -1,24 +1,18 @@
-<<<<<<< HEAD
-# Python
-=======
 # React Dependencies
 node_modules/
 
 # React Build outputs
-.next/
-.next/cache/
-.next/static/
-.next/standalone/
-.next/server/
-.next/BUILD_ID  
-.next/server
-
-# React Build artifacts
-
+frontend/.next/
+frontend/.next/cache/
+frontend/.next/static/
+frontend/.next/standalone/
+frontend/.next/server/
+frontend/.next/BUILD_ID
+out/
 build/
 dist/
 
-# React Environment variables
+# React Environment Variables
 .env
 .env.local
 .env.development.local
@@ -28,35 +22,36 @@ dist/
 # React Testing and Coverage
 coverage/
 .nyc_output/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
 
-# React Cache directories
+# React Cache
 .cache/
 .parcel-cache/
 
 # React Package manager files
 package-lock.json
 yarn.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .pnp
 .pnp.js
 
 # React ESLint cache
 .eslintcache
 
-# Flask Python files
->>>>>>> origin/main
+# Flask Python Files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-<<<<<<< HEAD
-=======
 
-# Flask Distribution / packaging
->>>>>>> origin/main
+# Flask Packaging and Distribution
 .Python
-build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -66,71 +61,52 @@ parts/
 sdist/
 var/
 wheels/
-<<<<<<< HEAD
-=======
 pip-wheel-metadata/
 share/python-wheels/
->>>>>>> origin/main
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-<<<<<<< HEAD
-# Virtual environments
-=======
-# Flask Virtual environments
->>>>>>> origin/main
+# Flask Virtual Environments
 venv/
 env/
 ENV/
 env.bak/
 venv.bak/
-<<<<<<< HEAD
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE
-=======
 .venv/
 
-# Flask Instance folder
+# Flask Instance Folder
 instance/
-
-# Flask Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-
-# Flask Database
-*.db
-*.sqlite
-*.sqlite3
 
 # Flask Logs
 *.log
 logs/
 
-# IDE and Editor files
->>>>>>> origin/main
+# Flask Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Flask Test Coverage
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# IDEs and Editor Files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-<<<<<<< HEAD
-# OS
-=======
-# OS generated files
->>>>>>> origin/main
+# OS Generated Files
 .DS_Store
 .DS_Store?
 ._*
@@ -139,55 +115,9 @@ logs/
 ehthumbs.db
 Thumbs.db
 
-<<<<<<< HEAD
-# Logs
-*.log
-logs/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Node modules (for frontend)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Next.js
-.next/
-out/
-
-# Coverage reports
-htmlcov/
-.coverage
-.coverage.*
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# Backup files
+# Backup and Temp Files
 *.bak
 *.backup
 *.tmp
-=======
-# Temporary files
 tmp/
 temp/
-*.tmp
-*.temp
-
-# Archive files
-*.zip
-*.tar.gz
-*.rar
-
->>>>>>> origin/main
