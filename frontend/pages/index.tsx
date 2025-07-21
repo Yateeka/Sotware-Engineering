@@ -72,6 +72,9 @@ const Home: React.FC = () => {
   return (
     <div className="w-full h-full min-h-screen bg-secondary">
       {/* Hero Section */}
+      <div className="absolute top-6 right-10 text-white font-bold text-xl underline">
+        Global Protest Tracker
+      </div>
       <section className="flex items-center justify-center h-screen bg-primary">
         <img
           src="/assets/Earth.png"
