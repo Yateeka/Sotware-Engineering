@@ -26,7 +26,7 @@ class LocationProtestMatch:
     reason: str
 
 class LocationBasedProtestDetector:
-    """Location-focused protest detection - much more reliable"""
+    """Reusable location-focused protest detection"""
     
     def __init__(self):
         # Simple core protest words
@@ -42,7 +42,7 @@ class LocationBasedProtestDetector:
             'strikers', 'crowd', 'gathering', 'assembly'
         }
         
-        # Improved location patterns
+        # Location patterns
         self.location_patterns = [
             # City, State patterns (most reliable)
             r'\bin\s+([A-Z][a-zA-Z\s]{2,20}?),\s*([A-Z][A-Z])\b',  # "in Seattle, WA"
@@ -70,7 +70,7 @@ class LocationBasedProtestDetector:
             r'\bin\s+([A-Z][a-zA-Z\s]{4,20}?),?\s+(?:California|Texas|Florida|New York|Pennsylvania|Illinois|Ohio|Georgia|Michigan|Virginia|Washington|Arizona|Massachusetts|Tennessee|Maryland|Colorado|Minnesota|Wisconsin|Oregon|Nevada|Indiana|North Carolina|South Carolina|Alabama|Louisiana|Kentucky|Arkansas|Iowa|Kansas|Utah|Oklahoma|Mississippi|Nebraska|West Virginia|Idaho|Hawaii|Maine|New Hampshire|Vermont|Delaware|Rhode Island|Montana|North Dakota|South Dakota|Wyoming|Alaska)\b'
         ]
         
-        # Known cities/places (you can expand this)
+        # Known cities/places
         self.known_locations = {
             # Major US cities
             'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia',
@@ -85,12 +85,12 @@ class LocationBasedProtestDetector:
             'Mexico City', 'Buenos Aires', 'São Paulo', 'Mumbai', 'Delhi', 'Beijing',
             'Shanghai', 'Seoul', 'Bangkok', 'Singapore', 'Hong Kong', 'Dubai',
             'Cairo', 'Lagos', 'Nairobi', 'Cape Town', 'Istanbul', 'Moscow',
+            'Dublin', 'Edinburgh', 'Glasgow', 'Manchester', 'Birmingham', 'Liverpool',
             
-            # US States (for broader matching)
+            # US States
             'California', 'Texas', 'Florida', 'New York', 'Pennsylvania', 'Illinois',
             'Ohio', 'Georgia', 'North Carolina', 'Michigan', 'New Jersey', 'Virginia',
             'Washington', 'Arizona', 'Massachusetts', 'Tennessee', 'Indiana', 'Maryland',
-            'Missouri', 'Wisconsin', 'Colorado', 'Minnesota', 'South Carolina', 'Alabama',
             
             # Common place names
             'downtown', 'city center', 'capitol', 'university', 'campus', 'city hall',
@@ -121,7 +121,7 @@ class LocationBasedProtestDetector:
                             locations.add(part_clean)
                 else:
                     match_clean = match.strip()
-                    if len(match_clean) <= 20:
+                    if len(match_clean) <= 20:  # Avoid overly long matches
                         locations.add(match_clean)
         
         # Additional simple patterns for common cases
@@ -201,12 +201,19 @@ class LocationBasedProtestDetector:
     
     def analyze_article(self, article: Dict) -> LocationProtestMatch:
         """Analyze article with location-first approach"""
-        # Extract text content
-        title = article.get('title', '') or ''
+        # Extract text content (different APIs have different field names)
+        title = article.get('webTitle', '') or article.get('title', '') or ''
+        
+        # Guardian API specific fields
+        standfirst = article.get('fields', {}).get('standfirst', '') if article.get('fields') else ''
+        body_text = article.get('fields', {}).get('bodyText', '') if article.get('fields') else ''
+        trail_text = article.get('fields', {}).get('trailText', '') if article.get('fields') else ''
+        
+        # Fallback to common fields
         description = article.get('description', '') or ''
         content = article.get('content', '') or ''
         
-        full_text = f"{title} {description} {content}"
+        full_text = f"{title} {standfirst} {trail_text} {body_text} {description} {content}"
         
         # Step 1: Extract locations
         locations = self.extract_locations(full_text)
@@ -284,7 +291,7 @@ class LocationBasedProtestDetector:
                 if analysis.locations_found and analysis.is_protest:
                     protest_articles.append((article, analysis))
             else:
-                # Relaxed requirements
+                # Relaxed: just needs to be classified as protest
                 if analysis.is_protest:
                     protest_articles.append((article, analysis))
         
@@ -294,26 +301,26 @@ class LocationBasedProtestDetector:
         return protest_articles
 
 
-class LocationBasedNewsAPIService:
-    """NewsAPI service with location-based protest detection"""
+class GuardianAPIService:
+    """Guardian API service with location-based protest detection"""
     
     def __init__(self, api_key: str = None):
-        self.source_id = "newsapi_location"
-        self.base_url = "https://newsapi.org/v2"
-        self.service_name = "location_newsapi_service"
-        self.min_request_interval = 1
+        self.source_id = "guardian_001"
+        self.base_url = "https://content.guardianapis.com"
+        self.service_name = "guardian_service"
+        self.min_request_interval = 0.1
         self.last_request_time = None
         
-        self.api_key = api_key or os.getenv('NEWSAPI_KEY')
+        self.api_key = api_key or os.getenv('GUARDIAN_API_KEY')
         if not self.api_key:
-            logger.warning("No NewsAPI key provided")
+            logger.warning("No Guardian API key provided. Get one from https://open-platform.theguardian.com/")
         
         # Initialize location-based detector
         self.protest_detector = LocationBasedProtestDetector()
         
         # Configuration
         self.request_timeout = 30
-        self.max_articles_per_request = 100
+        self.max_articles_per_request = 50  # Guardian's page size limit
     
     def wait_for_rate_limit(self):
         if self.last_request_time:
@@ -324,49 +331,43 @@ class LocationBasedNewsAPIService:
     def record_request(self):
         self.last_request_time = time.time()
     
-    def build_location_search_params(self, days_back: int = 7, language: str = "en") -> Dict:
-        """Build search parameters focused on locationable protests"""
+    def build_guardian_search_params(self, days_back: int = 7) -> Dict:
+        """Build Guardian API search parameters"""
         
-        # Use terms that are likely to have locations
-        location_focused_keywords = [
-            "protest in", "demonstration in", "rally in", "march in",
-            "strike at", "protesters in", "demonstrators in",
-            "civil rights march", "climate protest", "labor strike",
-            "downtown protest", "university protest", "capitol protest"
-        ]
+        # Guardian search query for protests
+        query = 'protest OR demonstration OR rally OR march OR strike OR "civil rights" OR activism'
         
-        # Build query
-        query = " OR ".join([f'"{keyword}"' for keyword in location_focused_keywords])
-        
+        # Date range
         to_date = datetime.now()
         from_date = to_date - timedelta(days=days_back)
         
         return {
             'q': query,
-            'language': language,
-            'sortBy': 'publishedAt',
-            'pageSize': self.max_articles_per_request,
-            'from': from_date.strftime('%Y-%m-%d'),
-            'to': to_date.strftime('%Y-%m-%d'),
-            'apiKey': self.api_key
+            'from-date': from_date.strftime('%Y-%m-%d'),
+            'to-date': to_date.strftime('%Y-%m-%d'),
+            'show-fields': 'standfirst,trailText,bodyText,thumbnail,wordcount',
+            'show-tags': 'keyword',
+            'page-size': self.max_articles_per_request,
+            'order-by': 'newest',
+            'api-key': self.api_key
         }
     
     def fetch_located_protests(self, days_back: int = 7, require_location: bool = True) -> Dict:
-        """Fetch protests that have specific locations"""
+        """Fetch protests from Guardian API with location filtering"""
         start_time = datetime.now()
         
         if not self.api_key:
-            return {"success": False, "error": "No API key provided"}
+            return {"success": False, "error": "No Guardian API key provided. Get one from https://open-platform.theguardian.com/"}
         
         try:
             self.wait_for_rate_limit()
             
-            # Build request with location-focused terms
-            params = self.build_location_search_params(days_back)
-            url = f"{self.base_url}/everything"
+            # Build request
+            params = self.build_guardian_search_params(days_back)
+            url = f"{self.base_url}/search"
             
-            logger.info(f"Fetching location-based protest news...")
-            logger.info(f"Query: {params['q'][:100]}...")
+            logger.info(f"Fetching Guardian news with location-based protest detection...")
+            logger.info(f"Query: {params['q']}")
             
             # Make request
             response = requests.get(url, params=params, timeout=self.request_timeout)
@@ -375,13 +376,14 @@ class LocationBasedNewsAPIService:
             
             # Parse response
             data = response.json()
-            if data.get('status') != 'ok':
-                return {"success": False, "error": data.get('message', 'API error')}
             
-            raw_articles = data.get('articles', [])
+            if data.get('response', {}).get('status') != 'ok':
+                return {"success": False, "error": f"Guardian API error: {data.get('message', 'Unknown error')}"}
+            
+            raw_articles = data.get('response', {}).get('results', [])
             total_raw = len(raw_articles)
             
-            logger.info(f"Analyzing {total_raw} articles for location-based protests...")
+            logger.info(f"Analyzing {total_raw} Guardian articles for location-based protests...")
             
             # Filter using location-based detection
             protest_articles = self.protest_detector.filter_protest_articles(
@@ -393,12 +395,18 @@ class LocationBasedNewsAPIService:
             processed_protests = []
             for article, analysis in protest_articles:
                 processed_article = {
-                    "title": article.get("title", ""),
-                    "description": article.get("description", ""),
-                    "url": article.get("url", ""),
-                    "publishedAt": article.get("publishedAt", ""),
-                    "source": article.get("source", {}).get("name", ""),
-                    "urlToImage": article.get("urlToImage", ""),
+                    "title": article.get("webTitle", ""),
+                    "url": article.get("webUrl", ""),
+                    "publishedAt": article.get("webPublicationDate", ""),
+                    "section": article.get("sectionName", ""),
+                    "pillar": article.get("pillarName", ""),
+                    "source": "The Guardian",
+                    
+                    # Guardian specific fields
+                    "standfirst": article.get("fields", {}).get("standfirst", "") if article.get("fields") else "",
+                    "trailText": article.get("fields", {}).get("trailText", "") if article.get("fields") else "",
+                    "wordcount": article.get("fields", {}).get("wordcount", "") if article.get("fields") else "",
+                    "thumbnail": article.get("fields", {}).get("thumbnail", "") if article.get("fields") else "",
                     
                     # Location-based analysis
                     "location_analysis": {
@@ -427,10 +435,11 @@ class LocationBasedNewsAPIService:
             for _, analysis in protest_articles:
                 protest_types[analysis.protest_type] = protest_types.get(analysis.protest_type, 0) + 1
             
-            logger.info(f"Found {len(protest_articles)} located protest articles from {total_raw} total")
+            logger.info(f"Found {len(protest_articles)} located protest articles from {total_raw} total Guardian articles")
             
             return {
                 "success": True,
+                "source": "The Guardian",
                 "total_articles_scanned": total_raw,
                 "located_protests_found": len(protest_articles),
                 "filter_efficiency": round(len(protest_articles) / total_raw * 100, 1) if total_raw > 0 else 0,
@@ -441,8 +450,81 @@ class LocationBasedNewsAPIService:
             }
             
         except Exception as e:
-            error_msg = f"Error in location-based protest detection: {str(e)}"
+            error_msg = f"Error in Guardian location-based protest detection: {str(e)}"
             logger.error(error_msg)
             return {"success": False, "error": error_msg}
-
+    
+    def test_connection(self) -> Dict:
+        """Test Guardian API connection"""
+        if not self.api_key:
+            return {
+                "success": False,
+                "status": "no_api_key",
+                "message": "No API key provided. Get one from https://open-platform.theguardian.com/",
+                "api_url": self.base_url
+            }
+        
+        try:
+            self.wait_for_rate_limit()
+            
+            # Simple test query
+            test_params = {
+                'q': 'test',
+                'page-size': 1,
+                'api-key': self.api_key
+            }
+            
+            start_time = datetime.now()
+            response = requests.get(f"{self.base_url}/search", params=test_params, timeout=10)
+            response_time = (datetime.now() - start_time).total_seconds()
+            
+            self.record_request()
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('response', {}).get('status') == 'ok':
+                    total_results = data.get('response', {}).get('total', 0)
+                    return {
+                        "success": True,
+                        "status": "connected",
+                        "response_time_ms": int(response_time * 1000),
+                        "api_url": self.base_url,
+                        "total_results_available": total_results
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "status": "api_error",
+                        "message": data.get('message', 'Unknown API error'),
+                        "api_url": self.base_url
+                    }
+            elif response.status_code == 401:
+                return {
+                    "success": False,
+                    "status": "invalid_api_key",
+                    "message": "Invalid API key",
+                    "api_url": self.base_url
+                }
+            elif response.status_code == 429:
+                return {
+                    "success": False,
+                    "status": "rate_limited",
+                    "message": "Rate limit exceeded",
+                    "api_url": self.base_url
+                }
+            else:
+                return {
+                    "success": False,
+                    "status": "connection_failed",
+                    "status_code": response.status_code,
+                    "api_url": self.base_url
+                }
+                
+        except Exception as e:
+            return {
+                "success": False,
+                "status": "error",
+                "error": str(e),
+                "api_url": self.base_url
+            }
 
