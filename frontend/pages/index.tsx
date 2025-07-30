@@ -237,7 +237,7 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="flex items-center justify-center h-screen bg-primary relative">
         {/* Dynamic Title - Shows Global Tracker or Country Name */}
-        <div className="absolute bottom-6 left-10 z-50 bg-white bg-opacity-90 px-6 py-3 rounded-lg shadow-md transition-all duration-300">
+        <div className="absolute bottom-6 left-10 z-30 bg-white bg-opacity-90 px-6 py-3 rounded-lg shadow-md transition-all duration-300">
           {hoveredCountry ? (
             <div>
               <h1 className="text-primary font-bold text-xl tracking-wide">
