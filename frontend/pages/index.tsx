@@ -1,377 +1,419 @@
-import { useState, useEffect } from 'react';
-import SimpleWorldMap from '../components/SimpleWorldMap';
+import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
 
+// Mock data types
 interface Protest {
-  id: number;
-  title: string;
-  location: string;
-  date: string;
-  participants: string;
-  status: 'ongoing' | 'ended' | 'planned';
+    id: string;
+    title: string;
+    location_description: string;
+    categories: string[];
+    participant_count: number;
+    status: 'planned' | 'ongoing' | 'completed';
+    start_date: string;
+    coordinates: [number, number];
 }
 
-interface CountryInfo {
-  name: string;
-  population?: string;
-  capital?: string;
-  recentEvents?: string[];
-  activeProtests?: number;
-  lastUpdated?: string;
+interface GlobalStats {
+    total_protests: number;
+    active_protests: number;
+    countries_covered: number;
+    total_participants?: number;
 }
 
-const Home: React.FC = () => {
-  const [recentProtests, setRecentProtests] = useState<Protest[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<CountryInfo | null>(null);
-  const [showCountryDialog, setShowCountryDialog] = useState(false);
-  const [hoveredCountry, setHoveredCountry] = useState<string>('');
+const LandingPage = () => {
+    const [featuredProtests, setFeaturedProtests] = useState<Protest[]>([]);
+    const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showSearchPrompt, setShowSearchPrompt] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-  // Sample country data - in a real app, this would come from an API
-  const getCountryInfo = (countryName: string): CountryInfo => {
-    const countryData: { [key: string]: CountryInfo } = {
-      'United States of America': {
-        name: 'United States',
-        population: '331 million',
-        capital: 'Washington, D.C.',
-        recentEvents: ['Climate Action March in NYC', 'Workers Rights Rally in California'],
-        activeProtests: 12,
-        lastUpdated: '2 hours ago'
-      },
-      'Germany': {
-        name: 'Germany',
-        population: '83 million',
-        capital: 'Berlin',
-        recentEvents: ['Environmental Protest in Berlin', 'Student Demonstration in Munich'],
-        activeProtests: 5,
-        lastUpdated: '4 hours ago'
-      },
-      'United Kingdom': {
-        name: 'United Kingdom',
-        population: '67 million',
-        capital: 'London',
-        recentEvents: ['Anti-War Protest in London', 'Healthcare Workers Strike'],
-        activeProtests: 8,
-        lastUpdated: '1 hour ago'
-      },
-      'France': {
-        name: 'France',
-        population: '68 million',
-        capital: 'Paris',
-        recentEvents: ['General Strike in Paris', 'Student Protests in Lyon'],
-        activeProtests: 15,
-        lastUpdated: '30 minutes ago'
-      },
-      'Brazil': {
-        name: 'Brazil',
-        population: '215 million',
-        capital: 'Brasília',
-        recentEvents: ['Amazon Protection Rally', 'Indigenous Rights March'],
-        activeProtests: 7,
-        lastUpdated: '3 hours ago'
-      }
+    useEffect(() => {
+        // Fetch featured protests and global stats
+        const fetchData = async () => {
+            try {
+                const [protestsRes, statsRes] = await Promise.all([
+                    fetch('http://localhost:5000/api/protests/featured'),
+                    fetch('http://localhost:5000/api/public/statistics')
+                ]);
+
+                const protestsData = await protestsRes.json();
+                const statsData = await statsRes.json();
+
+                setFeaturedProtests(protestsData.protests || []);
+                setGlobalStats(statsData);
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+                // Set fallback data for demo
+                setFeaturedProtests([
+                    {
+                        id: '1',
+                        title: 'Atlanta Climate Action Rally',
+                        location_description: 'Atlanta City Hall, Atlanta, GA',
+                        categories: ['Environmental', 'Climate Change'],
+                        participant_count: 450,
+                        status: 'planned',
+                        start_date: '2024-08-05T14:00:00',
+                        coordinates: [-84.3880, 33.7490]
+                    },
+                    {
+                        id: '2',
+                        title: 'March for Public Education Funding',
+                        location_description: 'Georgia State Capitol, Atlanta, GA',
+                        categories: ['Education', 'Labor Rights'],
+                        participant_count: 750,
+                        status: 'planned',
+                        start_date: '2024-08-17T10:00:00',
+                        coordinates: [-84.3963, 33.7490]
+                    }
+                ]);
+                setGlobalStats({
+                    total_protests: 60,
+                    active_protests: 15,
+                    countries_covered: 12,
+                    total_participants: 45000
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const handleSearchAttempt = () => {
+        setShowSearchPrompt(true);
+        setTimeout(() => setShowSearchPrompt(false), 3000);
     };
 
-    return countryData[countryName] || {
-      name: countryName,
-      population: 'Data not available',
-      capital: 'Unknown',
-      recentEvents: ['No recent events tracked'],
-      activeProtests: 0,
-      lastUpdated: 'Never'
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
     };
-  };
 
-  const handleCountryClick = (countryName: string) => {
-    const countryInfo = getCountryInfo(countryName);
-    setSelectedCountry(countryInfo);
-    setShowCountryDialog(true);
-  };
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'ongoing':
+                return 'bg-green-500';
+            case 'planned':
+                return 'bg-blue-500';
+            case 'completed':
+                return 'bg-gray-500';
+            default:
+                return 'bg-gray-500';
+        }
+    };
 
-  const handleCountryHover = (countryName: string) => {
-    setHoveredCountry(countryName);
-  };
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
 
-  const handleCountryLeave = () => {
-    setHoveredCountry('');
-  };
+    return (
+        <>
+            <Head>
+                <title>Global Protest Tracker - Monitoring Social Movements Worldwide</title>
+                <meta name="description" content="Track protests, social movements, and civic actions happening around the world. Stay informed about demonstrations for human rights, climate action, and social justice." />
+            </Head>
 
-  const closeDialog = () => {
-    setShowCountryDialog(false);
-    setSelectedCountry(null);
-  };
+            <div className="min-h-screen bg-gray-50">
+                {/* Hero Section */}
+                <section className="bg-gradient-to-r from-primary to-secondary text-white py-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center">
+                            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                                Global Protest Tracker
+                            </h1>
+                            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
+                                Monitoring social movements and civic actions worldwide. 
+                                Stay informed about demonstrations for human rights, climate action, and social justice.
+                            </p>
 
-  useEffect(() => {
-    setRecentProtests([
-      {
-        id: 1,
-        title: "Climate Action March",
-        location: "New York, USA",
-        date: "2024-03-15",
-        participants: "10,000+",
-        status: "ended"
-      },
-      {
-        id: 2,
-        title: "Workers Rights Demonstration",
-        location: "Berlin, Germany",
-        date: "2024-03-18",
-        participants: "5,000+",
-        status: "ongoing"
-      },
-      {
-        id: 3,
-        title: "Anti-War Protest",
-        location: "London, UK",
-        date: "2024-03-20",
-        participants: "15,000+",
-        status: "planned"
-      }
-    ]);
-  }, []);
-  useEffect(() => {
-    setRecentProtests([
-      {
-        id: 1,
-        title: "Climate Action March",
-        location: "New York, USA",
-        date: "2024-03-15",
-        participants: "10,000+",
-        status: "ended"
-      },
-      {
-        id: 2,
-        title: "Workers Rights Demonstration",
-        location: "Berlin, Germany",
-        date: "2024-03-18",
-        participants: "5,000+",
-        status: "ongoing"
-      },
-      {
-        id: 3,
-        title: "Anti-War Protest",
-        location: "London, UK",
-        date: "2024-03-20",
-        participants: "15,000+",
-        status: "planned"
-      }
-    ]);
-  }, []);
+                            {/* Search Bar (Demo - Shows Auth Required) */}
+                            <div className="max-w-2xl mx-auto mb-8">
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Search protests by location, issue, or organization..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onClick={handleSearchAttempt}
+                                        className="w-full px-6 py-4 text-lg rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30"
+                                    />
+                                    <button 
+                                        onClick={handleSearchAttempt}
+                                        className="absolute right-2 top-2 bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition-colors"
+                                    >
+                                        Search
+                                    </button>
+                                </div>
 
-  return (
-    <div className="w-full h-full min-h-screen bg-secondary relative">
-      {/* Country Information Dialog */}
-      {showCountryDialog && selectedCountry && (
-        <div className="fixed top-0 right-0 z-40 w-96 h-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
-          <div className="p-6 h-full overflow-y-auto">
-            {/* Dialog Header */}
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-primary">{selectedCountry.name}</h2>
-              <button
-                onClick={closeDialog}
-                className="text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-              >
-                ×
-              </button>
-            </div>
+                                {/* Search Auth Prompt */}
+                                {showSearchPrompt && (
+                                    <div className="mt-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                                        <p className="text-white/90 mb-3">
+                                            🔒 Please log in to access search functionality
+                                        </p>
+                                        <div className="flex gap-3 justify-center">
+                                            <Link 
+                                                href="/login"
+                                                className="bg-white text-primary px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                                            >
+                                                Login
+                                            </Link>
+                                            <Link 
+                                                href="/register"
+                                                className="bg-transparent border border-white text-white px-4 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors"
+                                            >
+                                                Register
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-            {/* Country Basic Info */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Country Information</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Capital:</span>
-                  <span className="font-medium">{selectedCountry.capital}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Population:</span>
-                  <span className="font-medium">{selectedCountry.population}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Active Protests:</span>
-                  <span className="font-medium text-primary">{selectedCountry.activeProtests}</span>
-                </div>
-              </div>
-            </div>
+                            {/* Call to Action */}
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Link 
+                                    href="/register"
+                                    className="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                                >
+                                    Join the Movement
+                                </Link>
+                                <Link 
+                                    href="/map"
+                                    className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+                                >
+                                    View Global Map
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-            {/* Recent Events */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Recent Events</h3>
-              <div className="space-y-3">
-                {selectedCountry.recentEvents?.map((event, index) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                    <div className="text-sm font-medium text-gray-800">{event}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                {/* Global Statistics */}
+                {globalStats && (
+                    <section className="bg-white py-16">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center mb-12">
+                                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                                    Global Impact
+                                </h2>
+                                <p className="text-lg text-gray-600">
+                                    Real-time data on social movements worldwide
+                                </p>
+                            </div>
 
-            {/* Status Indicators */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Status</h3>
-              <div className="flex items-center space-x-2 mb-2">
-                <div className={`w-3 h-3 rounded-full ${selectedCountry.activeProtests && selectedCountry.activeProtests > 0 ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                <span className="text-sm text-gray-600">
-                  {selectedCountry.activeProtests && selectedCountry.activeProtests > 0 ? 'Active Events' : 'No Active Events'}
-                </span>
-              </div>
-              <div className="text-xs text-gray-500">
-                Last updated: {selectedCountry.lastUpdated}
-              </div>
-            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                                <div className="text-center">
+                                    <div className="text-4xl font-bold text-primary mb-2">
+                                        {globalStats.total_protests.toLocaleString()}
+                                    </div>
+                                    <div className="text-gray-600">Total Protests Tracked</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-4xl font-bold text-green-600 mb-2">
+                                        {globalStats.active_protests}
+                                    </div>
+                                    <div className="text-gray-600">Currently Active</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-4xl font-bold text-blue-600 mb-2">
+                                        {globalStats.countries_covered}
+                                    </div>
+                                    <div className="text-gray-600">Countries Covered</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-4xl font-bold text-purple-600 mb-2">
+                                        {globalStats.total_participants?.toLocaleString() || '45K+'}
+                                    </div>
+                                    <div className="text-gray-600">Total Participants</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                )}
 
-            {/* Quick Actions */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Quick Actions</h3>
-              <div className="space-y-2">
-                <button className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors text-sm">
-                  View All Events
-                </button>
-                <button className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm">
-                  Subscribe to Updates
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                {/* Featured Protests */}
+                <section className="bg-gray-50 py-16">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                                Featured Protests
+                            </h2>
+                            <p className="text-lg text-gray-600">
+                                Major demonstrations and movements happening now
+                            </p>
+                        </div>
 
-      {/* Hero Section */}
-      <section className="flex items-center justify-center h-screen bg-primary relative">
-        {/* Dynamic Title - Shows Global Tracker or Country Name */}
-        <div className="absolute bottom-6 left-10 z-30 bg-white bg-opacity-90 px-6 py-3 rounded-lg shadow-md transition-all duration-300">
-          {hoveredCountry ? (
-            <div>
-              <h1 className="text-primary font-bold text-xl tracking-wide">
-                {hoveredCountry}
-              </h1>
-              <div className="text-xs text-primary text-opacity-70 mt-1">
-                Click to view details
-              </div>
-            </div>
-          ) : (
-            <div>
-              <h1 className="text-primary font-bold text-xl tracking-wide">
-                Global Protest Tracker
-              </h1>
-              <div className="text-xs text-primary text-opacity-70 mt-1">
-                Hover on a country to explore • Click for details
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <div className="w-full h-auto">
-          <SimpleWorldMap 
-            onCountryClick={handleCountryClick}
-            onCountryHover={handleCountryHover}
-            onCountryLeave={handleCountryLeave}
-          />
-        </div>
-      </section>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {featuredProtests.slice(0, 6).map((protest) => (
+                                <div key={protest.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                    <div className="p-6">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(protest.status)}`}>
+                                                {protest.status.toUpperCase()}
+                                            </span>
+                                            <span className="text-sm text-gray-500">
+                                                {formatDate(protest.start_date)}
+                                            </span>
+                                        </div>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="p-6">
-              <div className="text-4xl font-bold mb-2 text-primary">1,247</div>
-              <div className="text-gray-600">Total Events Tracked</div>
-            </div>
-            <div className="p-6">
-              <div className="text-4xl font-bold mb-2 text-accent-light">89</div>
-              <div className="text-gray-600">Countries Covered</div>
-            </div>
-            <div className="p-6">
-              <div className="text-4xl font-bold mb-2 text-primary">23</div>
-              <div className="text-gray-600">Active Today</div>
-            </div>
-          </div>
-        </div>
-      </section>
+                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                            {protest.title}
+                                        </h3>
+                                        
+                                        <p className="text-gray-600 mb-3">
+                                            📍 {protest.location_description}
+                                        </p>
 
-      {/* Recent Protests */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center text-primary">Recent Protests</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-semibold text-primary">Climate Action March</h3>
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-accent-light text-white">
-                  ended
-                </span>
-              </div>
-              <div className="space-y-2 text-gray-600">
-                <div className="flex items-center">
-                  <span className="font-medium">Location:</span>
-                  <span className="ml-2">New York, USA</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-medium">Date:</span>
-                  <span className="ml-2">
-                    {new Date("2024-03-15").toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-medium">Participants:</span>
-                  <span className="ml-2">10,000+</span>
-                </div>
-              </div>
+                                        <div className="flex flex-wrap gap-2 mb-4">
+                                            {protest.categories.map((category) => (
+                                                <span key={category} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                                                    {category}
+                                                </span>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-500">
+                                                👥 {protest.participant_count.toLocaleString()} participants
+                                            </span>
+                                            <Link 
+                                                href={`/protest/${protest.id}`}
+                                                className="text-primary hover:text-primary/80 font-medium"
+                                            >
+                                                Learn More →
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="text-center mt-12">
+                            <Link 
+                                href="/map"
+                                className="inline-block bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                            >
+                                View All Protests on Map
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Call to Action Section */}
+                <section className="bg-primary text-white py-16">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                        <h2 className="text-3xl font-bold mb-6">
+                            Ready to Get Involved?
+                        </h2>
+                        <p className="text-xl mb-8 opacity-90">
+                            Join thousands of citizens, activists, journalists, and researchers using our platform 
+                            to stay informed and take action on issues that matter.
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                            <div className="text-center">
+                                <div className="text-4xl mb-4">👥</div>
+                                <h3 className="text-xl font-semibold mb-2">Citizens</h3>
+                                <p className="opacity-90">Stay informed about local and global movements</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-4xl mb-4">✊</div>
+                                <h3 className="text-xl font-semibold mb-2">Activists</h3>
+                                <p className="opacity-90">Organize, report, and amplify your cause</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-4xl mb-4">📊</div>
+                                <h3 className="text-xl font-semibold mb-2">Researchers</h3>
+                                <p className="opacity-90">Access data and analytics on social movements</p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link 
+                                href="/register"
+                                className="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                            >
+                                Create Account
+                            </Link>
+                            <Link 
+                                href="/login"
+                                className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+                            >
+                                Sign In
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Quick Features Section */}
+                <section className="bg-white py-16">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                                Why Use Global Protest Tracker?
+                            </h2>
+                            <p className="text-lg text-gray-600">
+                                Comprehensive tools for understanding and participating in social movements
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div className="text-center">
+                                <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Real-Time Tracking</h3>
+                                <p className="text-gray-600">Live updates on protests and demonstrations worldwide</p>
+                            </div>
+
+                            <div className="text-center">
+                                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Global Coverage</h3>
+                                <p className="text-gray-600">Comprehensive data from cities and countries worldwide</p>
+                            </div>
+
+                            <div className="text-center">
+                                <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Verified Information</h3>
+                                <p className="text-gray-600">Fact-checked reports from trusted sources and eyewitnesses</p>
+                            </div>
+
+                            <div className="text-center">
+                                <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Instant Alerts</h3>
+                                <p className="text-gray-600">Get notified about protests and movements you care about</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-            
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-semibold text-primary">Workers Rights Demonstration</h3>
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary text-white">
-                  ongoing
-                </span>
-              </div>
-              <div className="space-y-2 text-gray-600">
-                <div className="flex items-center">
-                  <span className="font-medium">Location:</span>
-                  <span className="ml-2">Berlin, Germany</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-medium">Date:</span>
-                  <span className="ml-2">
-                    {new Date("2024-03-18").toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-medium">Participants:</span>
-                  <span className="ml-2">5,000+</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-semibold text-primary">Anti-War Protest</h3>
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-secondary text-primary">
-                  planned
-                </span>
-              </div>
-              <div className="space-y-2 text-gray-600">
-                <div className="flex items-center">
-                  <span className="font-medium">Location:</span>
-                  <span className="ml-2">London, UK</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-medium">Date:</span>
-                  <span className="ml-2">
-                    {new Date("2024-03-20").toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-medium">Participants:</span>
-                  <span className="ml-2">15,000+</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+        </>
+    );
 };
 
-export default Home;
+export default LandingPage;

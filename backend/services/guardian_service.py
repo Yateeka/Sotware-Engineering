@@ -29,7 +29,7 @@ class LocationBasedProtestDetector:
     """Reusable location-focused protest detection"""
     
     def __init__(self):
-        # Simple core protest words
+        # Simple core protest words (no ambiguous terms)
         self.core_protest_words = {
             'protest', 'demonstration', 'march', 'rally', 'strike', 
             'boycott', 'uprising', 'riot', 'picket', 'walkout',
@@ -42,7 +42,7 @@ class LocationBasedProtestDetector:
             'strikers', 'crowd', 'gathering', 'assembly'
         }
         
-        # Location patterns
+        # Improved location patterns
         self.location_patterns = [
             # City, State patterns (most reliable)
             r'\bin\s+([A-Z][a-zA-Z\s]{2,20}?),\s*([A-Z][A-Z])\b',  # "in Seattle, WA"
@@ -117,7 +117,7 @@ class LocationBasedProtestDetector:
                     # Handle multi-group matches - take the main city/location
                     for part in match:
                         part_clean = part.strip()
-                        if part_clean and len(part_clean) <= 20:
+                        if part_clean and len(part_clean) <= 20:  # Reasonable location name length
                             locations.add(part_clean)
                 else:
                     match_clean = match.strip()
@@ -242,7 +242,7 @@ class LocationBasedProtestDetector:
             
         else:
             # Both location AND protest keywords = high confidence
-            base_confidence = 0.7
+            base_confidence = 0.7  # Start high since we have both
             
             # Boost for multiple locations
             if len(locations) > 1:
@@ -262,7 +262,7 @@ class LocationBasedProtestDetector:
             
             confidence = min(base_confidence, 1.0)
             
-            is_protest = confidence >= 0.6
+            is_protest = confidence >= 0.6  # High threshold since we're being selective
             
             if is_protest:
                 reason = f"Location + protest keywords found: {locations[0]} + {', '.join(protest_keywords[:3])}"
@@ -308,7 +308,7 @@ class GuardianAPIService:
         self.source_id = "guardian_001"
         self.base_url = "https://content.guardianapis.com"
         self.service_name = "guardian_service"
-        self.min_request_interval = 0.1
+        self.min_request_interval = 0.1  # Guardian is more generous
         self.last_request_time = None
         
         self.api_key = api_key or os.getenv('GUARDIAN_API_KEY')
@@ -527,4 +527,35 @@ class GuardianAPIService:
                 "error": str(e),
                 "api_url": self.base_url
             }
+
+
+# ============= TEST SCRIPT =============
+def print_guardian_protests(articles, title="GUARDIAN PROTESTS"):
+    """Print Guardian protest articles with location analysis"""
+    print(f"\n{title}:")
+    print("=" * 100)
+    
+    for i, article in enumerate(articles, 1):
+        analysis = article.get('location_analysis', {})
+        
+        print(f"\n{i}. {article.get('title', 'No title')}")
+        print(f"   📰 Section: {article.get('section', 'Unknown')} | Pillar: {article.get('pillar', 'Unknown')}")
+        print(f"   📅 Published: {article.get('publishedAt', 'Unknown')}")
+        print(f"   🔗 URL: {article.get('url', 'No URL')[:80]}...")
+        
+        # Location analysis
+        print(f"   🎯 Confidence: {analysis.get('confidence_score', 0):.3f}")
+        print(f"   📍 Locations: {', '.join(analysis.get('locations_found', []))}")
+        print(f"   🏷️  Keywords: {', '.join(analysis.get('protest_keywords', [])[:4])}")
+        print(f"   📊 Type: {analysis.get('protest_type', 'unknown')}")
+        
+        if analysis.get('participant_count'):
+            print(f"   👥 Participants: {analysis.get('participant_count')}")
+            
+        print(f"   💡 Reason: {analysis.get('reason', 'No analysis')}")
+        
+        if article.get('standfirst'):
+            print(f"   📄 Standfirst: {article.get('standfirst', '')[:120]}...")
+        elif article.get('trailText'):
+            print(f"   📄 Trail: {article.get('trailText', '')[:120]}...")
 

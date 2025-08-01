@@ -21,3 +21,90 @@ body {
   --color-accent-light: #81a989; /* light green */
   --color-accent-dark: #02311c; /* dark green */
 }
+
+
+:root {
+    --color-primary: #1e40af;
+    --color-secondary: #3b82f6;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-600: #4b5563;
+    --color-gray-900: #111827;
+}
+
+/* Custom Tailwind classes if not using full Tailwind */
+.bg-primary {
+    background-color: var(--color-primary);
+}
+
+.bg-secondary {
+    background-color: var(--color-secondary);
+}
+
+.text-primary {
+    color: var(--color-primary);
+}
+
+.hover\:bg-primary\/90:hover {
+    background-color: rgba(30, 64, 175, 0.9);
+}
+
+.hover\:bg-secondary\/70:hover {
+    background-color: rgba(59, 130, 246, 0.7);
+}
+
+/* Smooth transitions for interactive elements */
+.transition-all {
+    transition: all 0.3s ease-in-out;
+}
+
+.transition-colors {
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* Loading animation */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pulse animation for loading states */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+/* Backdrop blur for modern glassmorphism effect */
+.backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+}
+
+/* Responsive text sizing */
+@media (max-width: 768px) {
+    .text-4xl {
+        font-size: 2.25rem;
+    }
+    
+    .text-6xl {
+        font-size: 3rem;
+    }
+}
